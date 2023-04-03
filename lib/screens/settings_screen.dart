@@ -1,6 +1,8 @@
-import 'package:chat/widgets/chat_text_field.dart';
+import 'package:chat/providers/default_nav_bar_item_notifier.dart';
+import 'package:chat/theme/theme_mode_notifier.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/widgets.dart';
+import 'package:provider/provider.dart';
 
 class SettingsScreen extends StatefulWidget {
   const SettingsScreen({super.key});
@@ -12,12 +14,24 @@ class SettingsScreen extends StatefulWidget {
 class _SettingsScreenState extends State<SettingsScreen> {
   @override
   Widget build(BuildContext context) {
+    final themeModeNotifier = Provider.of<ThemeModeNotifier>(context);
+    final defaultNavBarItemNotifier = Provider.of<DefaultNavBarItemNotifier>(context);
+
     return Column(
-      mainAxisAlignment: MainAxisAlignment.center,
       children: [
-        //ChatTextField()
+        SwitchListTile(
+          contentPadding: EdgeInsets.zero,
+          title: Text('Використовувати темну тему'),
+          value: themeModeNotifier.themeMode == ThemeMode.dark,
+          onChanged: (_) => themeModeNotifier.toggleThemeMode(),
+        ),
+        SwitchListTile(
+          contentPadding: EdgeInsets.zero,
+          title: Text('Тематичні діалоги за замовчуванням'),
+          value: defaultNavBarItemNotifier.defaultNavigationBarItem == NavBarItem.thematicChats,
+          onChanged: (_) => defaultNavBarItemNotifier.toggleUseThematicChatsByDefault(),
+        ),
       ],
     );
   }
-
 }

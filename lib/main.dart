@@ -1,6 +1,7 @@
 import 'package:chat/screens/app_screen.dart';
 import 'package:chat/theme/color_scheme.dart';
-import 'package:chat/theme/theme_provider.dart';
+import 'package:chat/theme/theme_mode_notifier.dart';
+import 'package:chat/theme/widget_themes.dart';
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 
@@ -24,10 +25,12 @@ class MyApp extends StatelessWidget {
             theme: ThemeData(
               useMaterial3: true,
               colorScheme: lightColorScheme,
+              dividerTheme: dividerThemeData,
             ),
             darkTheme: ThemeData(
               useMaterial3: true,
-              colorScheme: darkColorScheme
+              colorScheme: darkColorScheme,
+              dividerTheme: dividerThemeData,
             ),
             home: const AppScreen(),
           );
