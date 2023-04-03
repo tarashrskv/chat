@@ -14,7 +14,7 @@ enum Region {
   luhansk,
   lviv,
   mykolaiv,
-  odessa,
+  odesa,
   poltava,
   rivne,
   sumy,

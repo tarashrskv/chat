@@ -1,10 +1,11 @@
 import 'package:chat/models/age_option.dart';
 import 'package:chat/models/gender.dart';
 import 'package:chat/models/region.dart';
-import 'package:chat/widgets/bottom_sheet.dart';
 import 'package:chat/widgets/styles.dart';
 import 'package:flutter/material.dart';
 import 'package:font_awesome_flutter/font_awesome_flutter.dart';
+
+import 'bottom_sheet.dart';
 
 class LookingForInfo extends StatefulWidget {
   final ValueNotifier<Set<Gender>> gendersNotifier;
@@ -60,6 +61,7 @@ class _LookingForInfoState extends State<LookingForInfo> {
         ),
         const SizedBox(height: 24),
         TextField(
+          style: TextStyle(fontSize: 14),
           decoration: textFieldDecoration.copyWith(
             labelText: 'Вибери область'
           ),

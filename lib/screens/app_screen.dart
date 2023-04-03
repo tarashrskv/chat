@@ -3,6 +3,7 @@ import 'package:chat/providers/default_nav_bar_item_notifier.dart';
 import 'package:chat/screens/regular_search_screen.dart';
 import 'package:chat/screens/settings_screen.dart';
 import 'package:chat/screens/thematic_chats_screen.dart';
+import 'package:chat/widgets/bottom_sheet.dart';
 import 'package:chat/widgets/looking_for_info.dart';
 import 'package:chat/widgets/my_search_info.dart';
 import 'package:flutter/material.dart';
@@ -59,13 +60,15 @@ class _AppScreenState extends State<AppScreen> {
                     ];
                   },
                   onSelected: (index) async {
-                    await showModalBottomSheet(
+                    await showChatModalBottomSheet(
+                      proceedLabel: 'Зберегти',
+                      cancelLabel: 'Скасувати',
+                      onProceed: () {},
+                        onCancel: () {},
                       context: context,
-                      builder: (_) {
-                        return index == 0 ? MySearchInfo(
+                      content: index == 0 ? MySearchInfo(
                             genderNotifier: ValueNotifier(Gender.male), ageOptionNotifier: ValueNotifier(AgeOption.twentySixAndMore))
-                        : LookingForInfo(gendersNotifier: ValueNotifier({}), ageOptionsNotifier: ValueNotifier({}));
-                      },
+                        : LookingForInfo(gendersNotifier: ValueNotifier({}), ageOptionsNotifier: ValueNotifier({}))
                     );
                   },
                 )
@@ -97,12 +100,12 @@ class _AppScreenState extends State<AppScreen> {
 
   Widget _buildBottomNavBar(NavBarItem defaultNavBarItem) {
     const regularChatNavBarItem = BottomNavigationBarItem(
-      icon: FaIcon(FontAwesomeIcons.solidComments, size: 20),
+      icon: Icon(Icons.chat_bubble_rounded),
       label: 'Звичайний пошук',
     );
 
     const thematicChatsNavBarItem = BottomNavigationBarItem(
-      icon: FaIcon(FontAwesomeIcons.quoteRight, size: 20),
+      icon: Icon(Icons.lightbulb_rounded),
       label: 'Тематичні діалоги',
     );
 
@@ -117,7 +120,7 @@ class _AppScreenState extends State<AppScreen> {
             regularChatNavBarItem,
           ],
         const BottomNavigationBarItem(
-          icon: FaIcon(FontAwesomeIcons.gear, size: 20),
+          icon: Icon(Icons.settings_rounded),
           label: 'Налаштування',
         )
       ],
