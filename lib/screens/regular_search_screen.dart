@@ -1,7 +1,6 @@
 import 'package:chat/models/age_option.dart';
 import 'package:chat/models/gender.dart';
-import 'package:chat/widgets/looking_for_info.dart';
-import 'package:chat/widgets/my_search_info.dart';
+import 'package:chat/widgets/search_info.dart';
 import 'package:flutter/material.dart';
 
 class RegularSearchScreen extends StatefulWidget {
@@ -12,11 +11,11 @@ class RegularSearchScreen extends StatefulWidget {
 }
 
 class _RegularSearchScreenState extends State<RegularSearchScreen> {
-  late final ValueNotifier<Gender?> _myGenderNotifier;
-  late final ValueNotifier<AgeOption?> _myAgeOptionNotifier;
+  late final ValueNotifier<Gender?> _myGender;
+  late final ValueNotifier<AgeOption?> _myAgeOption;
 
-  late final ValueNotifier<Set<Gender>> _lookingForGendersNotifier;
-  late final ValueNotifier<Set<AgeOption>> _lookingForAgeOptionsNotifier;
+  late final ValueNotifier<Set<Gender>> _lookingForGenders;
+  late final ValueNotifier<Set<AgeOption>> _lookingForAgeOptions;
 
   bool _canPerformSearch = false;
 
@@ -27,14 +26,14 @@ class _RegularSearchScreenState extends State<RegularSearchScreen> {
     final myGender = Gender.male;
     final myAge = AgeOption.twentySixAndMore;
 
-    _myGenderNotifier = ValueNotifier(null)..addListener(_listenToChanges);
-    _myAgeOptionNotifier = ValueNotifier(null)..addListener(_listenToChanges);
+    _myGender = ValueNotifier(null)..addListener(_listenToChanges);
+    _myAgeOption = ValueNotifier(null)..addListener(_listenToChanges);
 
-    final lookingForGender = { Gender.female};
+    final lookingForGender = { Gender.female };
     final lookingForAge = { AgeOption.twentyOneToTwentyFive, AgeOption.twentySixAndMore};
 
-    _lookingForGendersNotifier = ValueNotifier(lookingForGender)..addListener(_listenToChanges);
-    _lookingForAgeOptionsNotifier = ValueNotifier(lookingForAge)..addListener(_listenToChanges);
+    _lookingForGenders = ValueNotifier(lookingForGender)..addListener(_listenToChanges);
+    _lookingForAgeOptions = ValueNotifier(lookingForAge)..addListener(_listenToChanges);
   }
 
   @override
@@ -46,16 +45,11 @@ class _RegularSearchScreenState extends State<RegularSearchScreen> {
           child: Column(
             crossAxisAlignment: CrossAxisAlignment.stretch,
             children: [
-              MySearchInfo(
-                genderNotifier: _myGenderNotifier,
-                ageOptionNotifier: _myAgeOptionNotifier,
-              ),
-              const SizedBox(height: 16),
-              const Divider(),
-              const SizedBox(height: 16),
-              LookingForInfo(
-                gendersNotifier: _lookingForGendersNotifier,
-                ageOptionsNotifier: _lookingForAgeOptionsNotifier,
+              SearchInfo(
+                  myGender: _myGender,
+                  myAgeOption: _myAgeOption,
+                  lookingForGenders: _lookingForGenders,
+                  lookingForAgeOptions: _lookingForAgeOptions,
               ),
             ],
           ),
@@ -80,17 +74,17 @@ class _RegularSearchScreenState extends State<RegularSearchScreen> {
 
   @override
   dispose() {
-    _myGenderNotifier.removeListener(_listenToChanges);
-    _myGenderNotifier.removeListener(_listenToChanges);
+    _myGender.removeListener(_listenToChanges);
+    _myGender.removeListener(_listenToChanges);
 
-    _myAgeOptionNotifier.removeListener(_listenToChanges);
-    _myAgeOptionNotifier.dispose();
+    _myAgeOption.removeListener(_listenToChanges);
+    _myAgeOption.dispose();
 
-    _lookingForGendersNotifier.removeListener(_listenToChanges);
-    _lookingForGendersNotifier.dispose();
+    _lookingForGenders.removeListener(_listenToChanges);
+    _lookingForGenders.dispose();
 
-    _lookingForAgeOptionsNotifier.removeListener(_listenToChanges);
-    _lookingForAgeOptionsNotifier.dispose();
+    _lookingForAgeOptions.removeListener(_listenToChanges);
+    _lookingForAgeOptions.dispose();
 
     super.dispose();
   }
@@ -98,10 +92,10 @@ class _RegularSearchScreenState extends State<RegularSearchScreen> {
   _listenToChanges() {
     setState(() {
       _canPerformSearch =
-          _myGenderNotifier.value != null &&
-          _myAgeOptionNotifier.value != null &&
-          _lookingForGendersNotifier.value.isNotEmpty &&
-          _lookingForAgeOptionsNotifier.value.isNotEmpty;
+          _myGender.value != null &&
+          _myAgeOption.value != null &&
+          _lookingForGenders.value.isNotEmpty &&
+          _lookingForAgeOptions.value.isNotEmpty;
     });
   }
 }

@@ -1,16 +1,9 @@
-import 'package:chat/models/age_option.dart';
 import 'package:chat/providers/default_nav_bar_item_notifier.dart';
 import 'package:chat/screens/regular_search_screen.dart';
 import 'package:chat/screens/settings_screen.dart';
 import 'package:chat/screens/thematic_chats_screen.dart';
-import 'package:chat/widgets/bottom_sheet.dart';
-import 'package:chat/widgets/looking_for_info.dart';
-import 'package:chat/widgets/my_search_info.dart';
 import 'package:flutter/material.dart';
-import 'package:font_awesome_flutter/font_awesome_flutter.dart';
 import 'package:provider/provider.dart';
-
-import '../models/gender.dart';
 
 class AppScreen extends StatefulWidget {
   const AppScreen({super.key});
@@ -46,38 +39,8 @@ class _AppScreenState extends State<AppScreen> {
             appBar: AppBar(
               toolbarHeight: 30,
               scrolledUnderElevation: 0,
-              actions: _getCurrentNavBarItem(provider.defaultNavigationBarItem) == NavBarItem.regularSearch ? [
-                PopupMenuButton(
-                  itemBuilder: (_) {
-                    return [
-                      PopupMenuItem(
-                        value: 0,
-                        child: Text('Моя інформація'),
-                      ),
-                      PopupMenuItem(
-                          value: 1,
-                          child: Text('Інформація мого пошуку')),
-                    ];
-                  },
-                  onSelected: (index) async {
-                    await showChatModalBottomSheet(
-                      proceedLabel: 'Зберегти',
-                      cancelLabel: 'Скасувати',
-                      onProceed: () {},
-                        onCancel: () {},
-                      context: context,
-                      content: index == 0 ? MySearchInfo(
-                            genderNotifier: ValueNotifier(Gender.male), ageOptionNotifier: ValueNotifier(AgeOption.twentySixAndMore))
-                        : LookingForInfo(gendersNotifier: ValueNotifier({}), ageOptionsNotifier: ValueNotifier({}))
-                    );
-                  },
-                )
-              ] : null,
             ),
-            body: Padding(
-              padding: const EdgeInsets.all(16),
-              child: _getContent(provider.defaultNavigationBarItem),
-            ),
+            body: _getContent(provider.defaultNavigationBarItem),
             bottomNavigationBar: _buildBottomNavBar(provider.defaultNavigationBarItem),
           );
         },
