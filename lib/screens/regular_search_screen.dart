@@ -14,10 +14,10 @@ class RegularSearchScreen extends StatefulWidget {
 
 class _RegularSearchScreenState extends State<RegularSearchScreen> {
   late final ValueNotifier<Gender?> _myGender;
-  late final ValueNotifier<AgeOption?> _myAgeOption;
+  late final ValueNotifier<AgeRange?> _myAgeRange;
 
   late final ValueNotifier<Set<Gender>> _lookingForGenders;
-  late final ValueNotifier<Set<AgeOption>> _lookingForAgeOptions;
+  late final ValueNotifier<Set<AgeRange>> _lookingForAgeRanges;
 
   late final ValueNotifier<Region?> _searchRegion;
   late final ValueNotifier<ChatMode?> _chatMode;
@@ -29,18 +29,20 @@ class _RegularSearchScreenState extends State<RegularSearchScreen> {
     super.initState();
 
     const myGender = Gender.male;
-    const myAge = AgeOption.twentySixAndMore;
+    const myAge = AgeRange.twentySixAndMore;
 
     _myGender = ValueNotifier(myGender)..addListener(_setCanPerformSearch);
-    _myAgeOption = ValueNotifier(myAge)
+    _myAgeRange = ValueNotifier(myAge)
       ..addListener(_setCanPerformSearch)
       ..addListener(_handleAdultChatMode);
 
     final lookingForGenders = {Gender.female};
-    final lookingForAgeOptions = {AgeOption.twentyOneToTwentyFive, AgeOption.twentySixAndMore};
+    final lookingForAgeRanges = {AgeRange.twentyOneToTwentyFive, AgeRange.twentySixAndMore};
 
-    _lookingForGenders = ValueNotifier(lookingForGenders)..addListener(_setCanPerformSearch);
-    _lookingForAgeOptions = ValueNotifier(lookingForAgeOptions)..addListener(_setCanPerformSearch);
+    _lookingForGenders = ValueNotifier(lookingForGenders)
+      ..addListener(_setCanPerformSearch);
+    _lookingForAgeRanges = ValueNotifier(lookingForAgeRanges)
+      ..addListener(_setCanPerformSearch);
 
     const searchRegion = Region.ivanoFrankivsk;
     const chatMode = ChatMode.regular;
@@ -48,7 +50,9 @@ class _RegularSearchScreenState extends State<RegularSearchScreen> {
     _searchRegion = ValueNotifier(searchRegion)..addListener(_setCanPerformSearch);
     _chatMode = ValueNotifier(chatMode)
       ..addListener(_setCanPerformSearch)
-      ..addListener(_handleUnder18AgeOptions);
+      ..addListener(_handleUnder18AgeRanges);
+
+    _setCanPerformSearch();
   }
 
   @override
@@ -62,9 +66,9 @@ class _RegularSearchScreenState extends State<RegularSearchScreen> {
             children: [
               SearchInfo(
                 myGender: _myGender,
-                myAgeOption: _myAgeOption,
+                myAgeRange: _myAgeRange,
                 lookingForGenders: _lookingForGenders,
-                lookingForAgeOptions: _lookingForAgeOptions,
+                lookingForAgeRanges: _lookingForAgeRanges,
                 searchRegion: _searchRegion,
                 chatMode: _chatMode,
               ),
@@ -93,48 +97,48 @@ class _RegularSearchScreenState extends State<RegularSearchScreen> {
     _myGender.removeListener(_setCanPerformSearch);
     _myGender.dispose();
 
-    _myAgeOption.removeListener(_setCanPerformSearch);
-    _myAgeOption.removeListener(_handleAdultChatMode);
-    _myAgeOption.dispose();
+    _myAgeRange.removeListener(_setCanPerformSearch);
+    _myAgeRange.removeListener(_handleAdultChatMode);
+    _myAgeRange.dispose();
 
     _lookingForGenders.removeListener(_setCanPerformSearch);
     _lookingForGenders.dispose();
 
-    _lookingForAgeOptions.removeListener(_setCanPerformSearch);
-    _lookingForAgeOptions.dispose();
+    _lookingForAgeRanges.removeListener(_setCanPerformSearch);
+    _lookingForAgeRanges.dispose();
 
     _searchRegion.removeListener(_setCanPerformSearch);
     _searchRegion.dispose();
 
     _chatMode.removeListener(_setCanPerformSearch);
-    _chatMode.removeListener(_handleUnder18AgeOptions);
+    _chatMode.removeListener(_handleUnder18AgeRanges);
     _chatMode.dispose();
 
     super.dispose();
   }
 
-  void _handleUnder18AgeOptions() {
+  void _handleUnder18AgeRanges() {
     if (_chatMode.value == ChatMode.adult &&
-        _lookingForAgeOptions.value.any((ageOption) => ageOption.isUnder18())) {
-      final ageOptions =
-          _lookingForAgeOptions.value.where((ageOption) => !ageOption.isUnder18()).toSet();
+        _lookingForAgeRanges.value.any((ageRange) => ageRange.isUnder18())) {
+      final ageRanges =
+          _lookingForAgeRanges.value.where((ageRange) => !ageRange.isUnder18()).toSet();
 
-      _lookingForAgeOptions.value = ageOptions;
+      _lookingForAgeRanges.value = ageRanges;
     }
   }
 
   void _handleAdultChatMode() {
-    if ((_myAgeOption.value?.isUnder18() ?? true) && _chatMode.value == ChatMode.adult) {
-      _chatMode?.value = null;
+    if ((_myAgeRange.value?.isUnder18() ?? true) && _chatMode.value == ChatMode.adult) {
+      _chatMode.value = null;
     }
   }
 
   void _setCanPerformSearch() {
     setState(() {
       _canPerformSearch = _myGender.value != null &&
-          _myAgeOption.value != null &&
+          _myAgeRange.value != null &&
           _lookingForGenders.value.isNotEmpty &&
-          _lookingForAgeOptions.value.isNotEmpty &&
+          _lookingForAgeRanges.value.isNotEmpty &&
           _searchRegion.value != null &&
           _chatMode.value != null;
     });

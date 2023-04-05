@@ -1,4 +1,4 @@
-enum AgeOption {
+enum AgeRange {
   underFifteen(displayValue: 'до 15 років'),
   sixteenToSeventeen(displayValue: '16-17'),
   eighteenToTwenty(displayValue: '18-20'),
@@ -7,12 +7,12 @@ enum AgeOption {
 
   final String displayValue;
 
-  const AgeOption({required this.displayValue});
+  const AgeRange({required this.displayValue});
 }
 
-extension AgeOptionX on AgeOption {
+extension AgeRangeX on AgeRange {
   bool isUnder18() {
-    if (this == AgeOption.underFifteen || this == AgeOption.sixteenToSeventeen) {
+    if (this == AgeRange.underFifteen || this == AgeRange.sixteenToSeventeen) {
       return true;
     }
     return false;

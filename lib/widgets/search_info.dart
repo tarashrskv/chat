@@ -8,10 +8,10 @@ import 'package:scrollable_positioned_list/scrollable_positioned_list.dart';
 
 class SearchInfo extends StatefulWidget {
   final ValueNotifier<Gender?> myGender;
-  final ValueNotifier<AgeOption?> myAgeOption;
+  final ValueNotifier<AgeRange?> myAgeRange;
 
   final ValueNotifier<Set<Gender>> lookingForGenders;
-  final ValueNotifier<Set<AgeOption>> lookingForAgeOptions;
+  final ValueNotifier<Set<AgeRange>> lookingForAgeRanges;
 
   final ValueNotifier<Region?> searchRegion;
   final ValueNotifier<ChatMode?> chatMode;
@@ -19,9 +19,9 @@ class SearchInfo extends StatefulWidget {
   const SearchInfo({
     super.key,
     required this.myGender,
-    required this.myAgeOption,
+    required this.myAgeRange,
     required this.lookingForGenders,
-    required this.lookingForAgeOptions,
+    required this.lookingForAgeRanges,
     required this.searchRegion,
     required this.chatMode,
   });
@@ -31,17 +31,17 @@ class SearchInfo extends StatefulWidget {
 }
 
 class _SearchInfoState extends State<SearchInfo> {
-  ValueNotifier<AgeOption?> _lastSelectedLookingForAgeOption = ValueNotifier(null);
+  final ValueNotifier<AgeRange?> _lastSelectedLookingForAgeRange = ValueNotifier(null);
 
-  final ItemScrollController _myAgeOptionScrollController = ItemScrollController();
-  final ItemScrollController _lookingForAgeOptionsScrollController = ItemScrollController();
+  final ItemScrollController _myAgeRangeScrollController = ItemScrollController();
+  final ItemScrollController _lookingForAgeRangesScrollController = ItemScrollController();
 
   @override
   void initState() {
     super.initState();
 
-    widget.myAgeOption.addListener(_scrollToMyAgeOptionOnSelected);
-    _lastSelectedLookingForAgeOption.addListener(_scrollToLookingForAgeOptionOnSelected);
+    widget.myAgeRange.addListener(_scrollToMyAgeRangeOnSelected);
+    _lastSelectedLookingForAgeRange.addListener(_scrollToLookingForAgeRangeOnSelected);
   }
 
   @override
@@ -53,14 +53,8 @@ class _SearchInfoState extends State<SearchInfo> {
           padding: const EdgeInsets.symmetric(horizontal: 24),
           child: SegmentedButton(
             segments: const [
-              ButtonSegment(
-                value: Gender.male,
-                label: Text('Я хлопець'),
-              ),
-              ButtonSegment(
-                value: Gender.female,
-                label: Text('Я дівчина'),
-              ),
+              ButtonSegment(value: Gender.male, label: Text('Я хлопець')),
+              ButtonSegment(value: Gender.female, label: Text('Я дівчина')),
             ],
             selected: {widget.myGender.value},
             onSelectionChanged: (genders) => widget.myGender.value = genders.single,
@@ -71,26 +65,13 @@ class _SearchInfoState extends State<SearchInfo> {
           padding: const EdgeInsets.only(left: 24),
           child: SizedBox(
             height: 48,
-            child: ScrollablePositionedList.builder(
-              initialScrollIndex: _getInitialScrollPositionForMyAgeOption(),
-              itemScrollController: _myAgeOptionScrollController,
+            child: ScrollablePositionedList.separated(
+              itemCount: AgeRange.values.length,
               scrollDirection: Axis.horizontal,
-              itemCount: AgeOption.values.length,
-              itemBuilder: (_, index) {
-                final ageOption = AgeOption.values[index];
-                return Padding(
-                  padding: const EdgeInsets.symmetric(horizontal: 6),
-                  child: ChoiceChip(
-                    label: Text(ageOption.displayValue),
-                    selected: widget.myAgeOption.value == ageOption,
-                    onSelected: (selected) {
-                      if (selected && widget.myAgeOption.value != ageOption) {
-                        widget.myAgeOption.value = ageOption;
-                      }
-                    },
-                  ),
-                );
-              },
+              initialScrollIndex: _getInitialScrollPositionForMyAgeRange(),
+              itemScrollController: _myAgeRangeScrollController,
+              itemBuilder: (_, index) => _buildMyAgeRangeChip(AgeRange.values[index]),
+              separatorBuilder: (_, __) => const SizedBox(width: 12),
             ),
           ),
         ),
@@ -101,10 +82,7 @@ class _SearchInfoState extends State<SearchInfo> {
           padding: const EdgeInsets.symmetric(horizontal: 24),
           child: SegmentedButton(
             segments: const [
-              ButtonSegment(
-                value: Gender.male,
-                label: Text('Шукаю хлопця'),
-              ),
+              ButtonSegment(value: Gender.male, label: Text('Шукаю хлопця')),
               ButtonSegment(value: Gender.female, label: Text('Шукаю дівчину')),
             ],
             selected: widget.lookingForGenders.value,
@@ -117,18 +95,13 @@ class _SearchInfoState extends State<SearchInfo> {
           padding: const EdgeInsets.only(left: 24),
           child: SizedBox(
             height: 48,
-            child: ScrollablePositionedList.builder(
-              initialScrollIndex: _getInitialScrollPositionForLookingForAgeOptions(),
+            child: ScrollablePositionedList.separated(
+              itemCount: AgeRange.values.length,
               scrollDirection: Axis.horizontal,
-              itemScrollController: _lookingForAgeOptionsScrollController,
-              itemCount: AgeOption.values.length,
-              itemBuilder: (_, index) {
-                final ageOption = AgeOption.values[index];
-                return Padding(
-                  padding: const EdgeInsets.symmetric(horizontal: 6),
-                  child: _buildLookingForAgeOptionChip(ageOption),
-                );
-              },
+              initialScrollIndex: _getInitialScrollPositionForLookingForAgeRanges(),
+              itemScrollController: _lookingForAgeRangesScrollController,
+              itemBuilder: (_, index) => _buildLookingForAgeRangeChip(AgeRange.values[index]),
+              separatorBuilder: (_, __) => const SizedBox(width: 12),
             ),
           ),
         ),
@@ -138,19 +111,18 @@ class _SearchInfoState extends State<SearchInfo> {
         Padding(
           padding: const EdgeInsets.symmetric(horizontal: 24),
           child: DropdownButtonFormField(
+            value: widget.searchRegion.value,
             onChanged: (region) => widget.searchRegion.value = region,
             focusNode: FocusNode(canRequestFocus: false),
+            // some misbehavior
             decoration: textFieldDecoration.copyWith(
-                labelText: 'Вибери регіон пошуку',
-                floatingLabelBehavior: FloatingLabelBehavior.always,
-              ),
-              items: [
-                for (final region in getFrequentRegions().followedBy(getOtherRegions()))
-                  DropdownMenuItem(
-                    value: region,
-                    child: Text(region.displayValue),
-                  )
-              ],
+              labelText: 'Вибери регіон пошуку',
+              floatingLabelBehavior: FloatingLabelBehavior.always,
+            ),
+            items: [
+              for (final region in getFrequentRegions().followedBy(getOtherRegions()))
+                DropdownMenuItem(value: region, child: Text(region.displayValue))
+            ],
           ),
         ),
         const SizedBox(height: 24),
@@ -165,7 +137,7 @@ class _SearchInfoState extends State<SearchInfo> {
               ButtonSegment(
                 value: ChatMode.adult,
                 label: Text('Флірт'),
-                enabled: !(widget.myAgeOption.value?.isUnder18() ?? false),
+                enabled: !(widget.myAgeRange.value?.isUnder18() ?? false),
               ),
             ],
             selected: {widget.chatMode.value},
@@ -178,95 +150,109 @@ class _SearchInfoState extends State<SearchInfo> {
 
   @override
   void dispose() {
-    widget.myAgeOption.removeListener(_scrollToMyAgeOptionOnSelected);
+    widget.myAgeRange.removeListener(_scrollToMyAgeRangeOnSelected);
 
-    _lastSelectedLookingForAgeOption.removeListener(_scrollToLookingForAgeOptionOnSelected);
-    _lastSelectedLookingForAgeOption.dispose();
+    _lastSelectedLookingForAgeRange.removeListener(_scrollToLookingForAgeRangeOnSelected);
+    _lastSelectedLookingForAgeRange.dispose();
 
     super.dispose();
   }
 
-  int _getInitialScrollPositionForMyAgeOption() {
-    final myAgeOption = widget.myAgeOption.value;
-    if (myAgeOption == null) {
+  int _getInitialScrollPositionForMyAgeRange() {
+    final myAgeRange = widget.myAgeRange.value;
+    if (myAgeRange == null) {
       return 0;
     }
 
-    final index = AgeOption.values.indexOf(myAgeOption);
-    if (index == AgeOption.values.length - 1) {
+    final index = AgeRange.values.indexOf(myAgeRange);
+    if (index == AgeRange.values.length - 1) {
       return index - 1;
     }
 
     return index;
   }
 
-  int _getInitialScrollPositionForLookingForAgeOptions() {
-    final lookingForAgeOptions = widget.lookingForAgeOptions.value;
-    if (lookingForAgeOptions.isEmpty) {
+  int _getInitialScrollPositionForLookingForAgeRanges() {
+    final lookingForAgeRanges = widget.lookingForAgeRanges.value;
+    if (lookingForAgeRanges.isEmpty) {
       return 0;
     }
 
-    final indexOfFirst = AgeOption.values
-        .indexWhere((ageOption) => widget.lookingForAgeOptions.value.contains(ageOption));
-    if (indexOfFirst == AgeOption.values.length - 1) {
+    final indexOfFirst = AgeRange.values
+        .indexWhere((ageRange) => widget.lookingForAgeRanges.value.contains(ageRange));
+    if (indexOfFirst == AgeRange.values.length - 1) {
       return indexOfFirst - 1;
     }
 
     return indexOfFirst;
   }
 
-  Future<void> _scrollToMyAgeOptionOnSelected() {
-    final myAgeOption = widget.myAgeOption.value;
-    if (myAgeOption == null) {
+  Future<void> _scrollToMyAgeRangeOnSelected() {
+    final ageRange = widget.myAgeRange.value;
+    if (ageRange == null) {
       return Future<void>.value();
     }
 
-    var index = AgeOption.values.indexOf(widget.myAgeOption.value!);
+    var index = AgeRange.values.indexOf(ageRange);
     if (index > 2) {
       index -= 1;
     }
 
-    return _myAgeOptionScrollController.scrollTo(
+    return _myAgeRangeScrollController.scrollTo(
       index: index == 0 ? 0 : index - 1,
-      alignment: 0,
+      alignment: 0.025,
       duration: const Duration(milliseconds: 250),
     );
   }
 
-  Future<void> _scrollToLookingForAgeOptionOnSelected() {
-    if (_lastSelectedLookingForAgeOption.value == null) {
+  Future<void> _scrollToLookingForAgeRangeOnSelected() {
+    final ageRange = _lastSelectedLookingForAgeRange.value;
+    if (ageRange == null) {
       return Future<void>.value();
     }
 
-    var index = AgeOption.values.indexOf(_lastSelectedLookingForAgeOption.value!);
+    var index = AgeRange.values.indexOf(ageRange);
     if (index > 2) {
       index -= 1;
     }
 
-    return _lookingForAgeOptionsScrollController.scrollTo(
+    return _lookingForAgeRangesScrollController.scrollTo(
       index: index == 0 ? 0 : index - 1,
+      alignment: 0.025,
       duration: const Duration(milliseconds: 250),
     );
   }
 
-  Widget _buildLookingForAgeOptionChip(AgeOption ageOption) {
-    shouldExcludeUnder18() => widget.chatMode.value == ChatMode.adult && ageOption.isUnder18();
+  Widget _buildMyAgeRangeChip(AgeRange ageRange) {
+    return ChoiceChip(
+      label: Text(ageRange.displayValue),
+      selected: widget.myAgeRange.value == ageRange,
+      onSelected: (selected) {
+        if (selected && widget.myAgeRange.value != ageRange) {
+          widget.myAgeRange.value = ageRange;
+        }
+      },
+    );
+  }
+
+  Widget _buildLookingForAgeRangeChip(AgeRange ageRange) {
+    final shouldExclude = widget.chatMode.value == ChatMode.adult && ageRange.isUnder18();
 
     return FilterChip(
-      label: Text(ageOption.displayValue),
-      selected: shouldExcludeUnder18() ? false : widget.lookingForAgeOptions.value.contains(ageOption),
-      onSelected: shouldExcludeUnder18()
+      label: Text(ageRange.displayValue),
+      selected: shouldExclude ? false : widget.lookingForAgeRanges.value.contains(ageRange),
+      onSelected: shouldExclude
           ? null
           : (selected) {
-              final ageOptions = widget.lookingForAgeOptions.value;
-              if (selected && !ageOptions.contains(ageOption)) {
-                _lastSelectedLookingForAgeOption.value = ageOption;
+              final ageRanges = widget.lookingForAgeRanges.value.toSet();
+              if (selected && !ageRanges.contains(ageRange)) {
+                _lastSelectedLookingForAgeRange.value = ageRange;
 
-                ageOptions.add(ageOption);
-                widget.lookingForAgeOptions.value = ageOptions;
-              } else if (!selected && ageOptions.contains(ageOption)) {
-                ageOptions.remove(ageOption);
-                widget.lookingForAgeOptions.value = ageOptions;
+                ageRanges.add(ageRange);
+                widget.lookingForAgeRanges.value = ageRanges;
+              } else if (!selected && ageRanges.contains(ageRange)) {
+                ageRanges.remove(ageRange);
+                widget.lookingForAgeRanges.value = ageRanges;
               }
             },
     );
