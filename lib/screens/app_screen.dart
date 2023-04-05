@@ -13,6 +13,7 @@ class AppScreen extends StatefulWidget {
 }
 
 class _AppScreenState extends State<AppScreen> {
+  final s = ScrollController();
   static const Map<NavBarItem, List<NavBarItem>> _navBarItemOrder = {
     NavBarItem.regularSearch: [
       NavBarItem.regularSearch,
@@ -62,18 +63,18 @@ class _AppScreenState extends State<AppScreen> {
   }
 
   Widget _buildBottomNavBar(NavBarItem defaultNavBarItem) {
-    const regularChatNavBarItem = BottomNavigationBarItem(
+    const regularChatNavBarItem = NavigationDestination(
       icon: Icon(Icons.chat_bubble_rounded),
       label: 'Звичайний пошук',
     );
 
-    const thematicChatsNavBarItem = BottomNavigationBarItem(
-      icon: Icon(Icons.lightbulb_rounded),
+    const thematicChatsNavBarItem = NavigationDestination(
+      icon: Icon(Icons.lightbulb_outline_rounded),
       label: 'Тематичні діалоги',
     );
 
-    return BottomNavigationBar(
-      items: [
+    return NavigationBar(
+      destinations: [
         if (defaultNavBarItem == NavBarItem.regularSearch) ...[
           regularChatNavBarItem,
           thematicChatsNavBarItem,
@@ -82,13 +83,13 @@ class _AppScreenState extends State<AppScreen> {
             thematicChatsNavBarItem,
             regularChatNavBarItem,
           ],
-        const BottomNavigationBarItem(
+        const NavigationDestination(
           icon: Icon(Icons.settings_rounded),
           label: 'Налаштування',
         )
       ],
-      onTap: _onNavigationItemTapped,
-      currentIndex: _selectedNavigationItemIndex,
+      onDestinationSelected: _onNavigationItemTapped,
+      selectedIndex: _selectedNavigationItemIndex,
     );
   }
 
