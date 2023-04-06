@@ -13,7 +13,6 @@ class AppScreen extends StatefulWidget {
 }
 
 class _AppScreenState extends State<AppScreen> {
-  final s = ScrollController();
   static const Map<NavBarItem, List<NavBarItem>> _navBarItemOrder = {
     NavBarItem.regularSearch: [
       NavBarItem.regularSearch,
@@ -28,10 +27,10 @@ class _AppScreenState extends State<AppScreen> {
   };
 
   int _selectedNavigationItemIndex = 0;
-  late NavBarItem _selectedNavigationBarItem;
 
   @override
   Widget build(BuildContext context) {
+    // TODO: move Provider lower
     return ChangeNotifierProvider(
       create: (_) => DefaultNavBarItemNotifier(),
       child: Consumer<DefaultNavBarItemNotifier>(
@@ -63,33 +62,47 @@ class _AppScreenState extends State<AppScreen> {
   }
 
   Widget _buildBottomNavBar(NavBarItem defaultNavBarItem) {
-    const regularChatNavBarItem = NavigationDestination(
-      icon: Icon(Icons.chat_bubble_rounded),
-      label: 'Звичайний пошук',
-    );
-
-    const thematicChatsNavBarItem = NavigationDestination(
-      icon: Icon(Icons.lightbulb_outline_rounded),
-      label: 'Тематичні діалоги',
-    );
-
     return NavigationBar(
-      destinations: [
-        if (defaultNavBarItem == NavBarItem.regularSearch) ...[
-          regularChatNavBarItem,
-          thematicChatsNavBarItem,
-        ] else
-          ...[
-            thematicChatsNavBarItem,
-            regularChatNavBarItem,
-          ],
-        const NavigationDestination(
-          icon: Icon(Icons.settings_rounded),
-          label: 'Налаштування',
-        )
-      ],
+      destinations: getDestinations(defaultNavBarItem).toList(),
       onDestinationSelected: _onNavigationItemTapped,
       selectedIndex: _selectedNavigationItemIndex,
+    );
+  }
+
+  Iterable<NavigationDestination> getDestinations(NavBarItem defaultNavBarItem) sync* {
+    final regularChatActive =
+        (defaultNavBarItem == NavBarItem.regularSearch && _selectedNavigationItemIndex == 0) ||
+            (defaultNavBarItem == NavBarItem.thematicChats && _selectedNavigationItemIndex == 1);
+    final regularChatNavBarItem = NavigationDestination(
+      icon: regularChatActive
+          ? const Icon(Icons.chat_bubble_rounded)
+          : const Icon(Icons.chat_bubble_outline_rounded),
+      label: 'Звичайні',
+    );
+
+    final isThematicChatActive =
+        (defaultNavBarItem == NavBarItem.thematicChats && _selectedNavigationItemIndex == 0) ||
+            (defaultNavBarItem == NavBarItem.regularSearch && _selectedNavigationItemIndex == 1);
+    final thematicChatsNavBarItem = NavigationDestination(
+      icon: isThematicChatActive
+          ? const Icon(Icons.lightbulb_rounded)
+          : const Icon(Icons.lightbulb_outline_rounded),
+      label: 'Тематичні',
+    );
+
+    if (defaultNavBarItem == NavBarItem.regularSearch) {
+      yield regularChatNavBarItem;
+      yield thematicChatsNavBarItem;
+    } else {
+      yield thematicChatsNavBarItem;
+      yield regularChatNavBarItem;
+    }
+
+    yield NavigationDestination(
+      icon: _selectedNavigationItemIndex == 2
+          ? const Icon(Icons.settings_rounded)
+          : const Icon(Icons.settings_outlined),
+      label: 'Налаштування',
     );
   }
 
@@ -103,4 +116,3 @@ class _AppScreenState extends State<AppScreen> {
     return _navBarItemOrder[defaultNavBarItem]![_selectedNavigationItemIndex];
   }
 }
-

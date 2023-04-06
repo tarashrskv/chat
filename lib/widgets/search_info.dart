@@ -50,7 +50,7 @@ class _SearchInfoState extends State<SearchInfo> {
       crossAxisAlignment: CrossAxisAlignment.stretch,
       children: [
         Padding(
-          padding: const EdgeInsets.symmetric(horizontal: 24),
+          padding: const EdgeInsets.symmetric(horizontal: 16),
           child: SegmentedButton(
             segments: const [
               ButtonSegment(value: Gender.male, label: Text('Я хлопець')),
@@ -62,7 +62,7 @@ class _SearchInfoState extends State<SearchInfo> {
         ),
         const SizedBox(height: 20),
         Padding(
-          padding: const EdgeInsets.only(left: 24),
+          padding: const EdgeInsets.only(left: 16),
           child: SizedBox(
             height: 48,
             child: ScrollablePositionedList.separated(
@@ -71,15 +71,15 @@ class _SearchInfoState extends State<SearchInfo> {
               initialScrollIndex: _getInitialScrollPositionForMyAgeRange(),
               itemScrollController: _myAgeRangeScrollController,
               itemBuilder: (_, index) => _buildMyAgeRangeChip(AgeRange.values[index]),
-              separatorBuilder: (_, __) => const SizedBox(width: 12),
+              separatorBuilder: (_, __) => const SizedBox(width: 8),
             ),
           ),
         ),
         const SizedBox(height: 20),
-        const Divider(indent: 16, endIndent: 16),
+        const Divider(indent: 20, endIndent: 20),
         const SizedBox(height: 24),
         Padding(
-          padding: const EdgeInsets.symmetric(horizontal: 24),
+          padding: const EdgeInsets.symmetric(horizontal: 16),
           child: SegmentedButton(
             segments: const [
               ButtonSegment(value: Gender.male, label: Text('Шукаю хлопця')),
@@ -92,21 +92,24 @@ class _SearchInfoState extends State<SearchInfo> {
         ),
         const SizedBox(height: 20),
         Padding(
-          padding: const EdgeInsets.only(left: 24),
+          padding: const EdgeInsets.only(left: 16),
           child: SizedBox(
             height: 48,
             child: ScrollablePositionedList.separated(
+              addAutomaticKeepAlives: false,
+              addRepaintBoundaries: false,
+              minCacheExtent: 5,
               itemCount: AgeRange.values.length,
               scrollDirection: Axis.horizontal,
               initialScrollIndex: _getInitialScrollPositionForLookingForAgeRanges(),
               itemScrollController: _lookingForAgeRangesScrollController,
               itemBuilder: (_, index) => _buildLookingForAgeRangeChip(AgeRange.values[index]),
-              separatorBuilder: (_, __) => const SizedBox(width: 12),
+              separatorBuilder: (_, __) => const SizedBox(width: 8),
             ),
           ),
         ),
         const SizedBox(height: 24),
-        const Divider(indent: 16, endIndent: 16),
+        const Divider(indent: 20, endIndent: 20),
         const SizedBox(height: 24),
         Padding(
           padding: const EdgeInsets.symmetric(horizontal: 24),
@@ -132,12 +135,12 @@ class _SearchInfoState extends State<SearchInfo> {
             segments: [
               const ButtonSegment(
                 value: ChatMode.regular,
-                label: Text('Звичайний чат'),
+                label: Text('Звичайний'),
               ),
               ButtonSegment(
                 value: ChatMode.adult,
                 label: Text('Флірт'),
-                enabled: !(widget.myAgeRange.value?.isUnder18() ?? false),
+                enabled: widget.myAgeRange.value?.isUnder18() != true,
               ),
             ],
             selected: {widget.chatMode.value},
@@ -193,13 +196,13 @@ class _SearchInfoState extends State<SearchInfo> {
       return Future<void>.value();
     }
 
-    var index = AgeRange.values.indexOf(ageRange);
-    if (index > 2) {
-      index -= 1;
+    var indexToScroll = AgeRange.values.indexOf(ageRange);
+    if (indexToScroll > 2) {
+      indexToScroll -= 1;
     }
 
     return _myAgeRangeScrollController.scrollTo(
-      index: index == 0 ? 0 : index - 1,
+      index: indexToScroll == 0 ? 0 : indexToScroll - 1,
       alignment: 0.025,
       duration: const Duration(milliseconds: 250),
     );
@@ -211,13 +214,13 @@ class _SearchInfoState extends State<SearchInfo> {
       return Future<void>.value();
     }
 
-    var index = AgeRange.values.indexOf(ageRange);
-    if (index > 2) {
-      index -= 1;
+    var indexToScroll = AgeRange.values.indexOf(ageRange);
+    if (indexToScroll > 2) {
+      indexToScroll -= 1;
     }
 
     return _lookingForAgeRangesScrollController.scrollTo(
-      index: index == 0 ? 0 : index - 1,
+      index: indexToScroll == 0 ? 0 : indexToScroll - 1,
       alignment: 0.025,
       duration: const Duration(milliseconds: 250),
     );
@@ -252,6 +255,12 @@ class _SearchInfoState extends State<SearchInfo> {
                 widget.lookingForAgeRanges.value = ageRanges;
               } else if (!selected && ageRanges.contains(ageRange)) {
                 ageRanges.remove(ageRange);
+                if (ageRanges.isEmpty) {
+                  _lookingForAgeRangesScrollController.scrollTo(index: 0, duration: Duration(milliseconds: 250));
+                }
+
+                _lastSelectedLookingForAgeRange.value = null;
+
                 widget.lookingForAgeRanges.value = ageRanges;
               }
             },

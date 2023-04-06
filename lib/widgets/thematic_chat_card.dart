@@ -5,7 +5,7 @@ class ThematicChatCard extends StatelessWidget {
   final String title;
   final String description;
   final Gender? authorGender;
-  final String? authorAge;
+  final int? authorAge;
   final String? authorLocation;
   final bool hasQuestions;
   final bool isAdult;
@@ -38,7 +38,7 @@ class ThematicChatCard extends StatelessWidget {
                   Expanded(
                     child: Text(
                       title,
-                      style: const TextStyle(fontSize: 18),
+                      style: const TextStyle(fontSize: 18, fontWeight: FontWeight.w500),
                     ),
                   ),
                   if (isAdult) ...[
@@ -50,7 +50,7 @@ class ThematicChatCard extends StatelessWidget {
                   ]
                 ],
               ),
-              const SizedBox(height: 8),
+              const SizedBox(height: 12),
               Row(
                 mainAxisAlignment: MainAxisAlignment.start,
                 children: [
@@ -58,24 +58,31 @@ class ThematicChatCard extends StatelessWidget {
                     Icon(authorGender == Gender.male ? Icons.man_4_outlined : Icons.woman_2_rounded),
                     const SizedBox(width: 4),
                     Text(authorGender!.display()),
-                    const SizedBox(width: 8),
+                    const SizedBox(width: 12),
                   ],
                   if (authorAge != null) ...[
                     const Icon(Icons.calendar_today_outlined),
                     const SizedBox(width: 4),
-                    Text(authorAge!),
-                    const SizedBox(width: 8),
+                    Text(authorAge!.toString()),
+                    const SizedBox(width: 12),
                   ],
                   if (authorLocation != null) ...[
                     const Icon(Icons.location_on_outlined),
                     const SizedBox(width: 4),
-                    Flexible(child: Text(authorLocation!, overflow: TextOverflow.ellipsis, softWrap: true, maxLines: 1,)),
+                    Flexible(
+                      child: Text(
+                        authorLocation!,
+                        overflow: TextOverflow.ellipsis,
+                        softWrap: true,
+                        maxLines: 2,
+                      ),
+                    ),
                   ],
                 ],
               ),
-              const SizedBox(height: 8),
+              const SizedBox(height: 12),
               const Divider(),
-              const SizedBox(height: 8),
+              const SizedBox(height: 12),
               Text(
                 description,
                 style: const TextStyle(fontSize: 16),
@@ -86,9 +93,7 @@ class ThematicChatCard extends StatelessWidget {
                 children: [
                   OutlinedButton.icon(
                     onPressed: () {},
-                    icon: hasQuestions
-                        ? const Icon(Icons.lock)
-                        : const Icon(Icons.chevron_right_rounded),
+                    icon: hasQuestions ? const Icon(Icons.lock) : const Icon(Icons.chevron_right_rounded),
                     label: const Text("З'єднати"),
                   ),
                 ],

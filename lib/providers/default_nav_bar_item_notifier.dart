@@ -2,7 +2,7 @@ import 'package:flutter/widgets.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 
 class DefaultNavBarItemNotifier with ChangeNotifier {
-  static const defaultNavBarItemKey = 'defaultNavBarItem';
+  static const defaultNavBarItemKey = 'defaultNavigationBarItem';
 
   NavBarItem? _defaultNavigationBarItem;
 
