@@ -44,7 +44,7 @@ class _ThematicChatsScreenState extends State<ThematicChatsScreen> {
                       description: messages[index].description!,
                       authorGender: messages[index].author.gender,
                       authorAge: messages[index].author.age,
-                      authorLocation: messages[index].author.geo,
+                      authorLocation: messages[index].author.geo ,
                       hasQuestions: messages[index].questions == null,
                       isAdult: messages[index].adultOnly == true,
                   );

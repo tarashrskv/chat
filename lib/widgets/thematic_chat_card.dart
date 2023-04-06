@@ -55,13 +55,13 @@ class ThematicChatCard extends StatelessWidget {
                 mainAxisAlignment: MainAxisAlignment.start,
                 children: [
                   if (authorGender != null) ...[
-                    Icon(authorGender == Gender.male ? Icons.man_4_outlined : Icons.woman_2_rounded),
+                    Icon(authorGender == Gender.male ? Icons.male_rounded : Icons.female_rounded),
                     const SizedBox(width: 4),
                     Text(authorGender!.display()),
                     const SizedBox(width: 12),
                   ],
                   if (authorAge != null) ...[
-                    const Icon(Icons.calendar_today_outlined),
+                    const Icon(Icons.calendar_month_outlined), // maybe cake
                     const SizedBox(width: 4),
                     Text(authorAge!.toString()),
                     const SizedBox(width: 12),
