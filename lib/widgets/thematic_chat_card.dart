@@ -1,4 +1,5 @@
 import 'package:chat/models/gender.dart';
+import 'package:chat/widgets/extensions/context_x.dart';
 import 'package:flutter/material.dart';
 
 class ThematicChatCard extends StatelessWidget {
@@ -38,36 +39,39 @@ class ThematicChatCard extends StatelessWidget {
                   Expanded(
                     child: Text(
                       title,
-                      style: const TextStyle(fontSize: 18, fontWeight: FontWeight.w500),
+                      style: const TextStyle(fontSize: 16, fontWeight: FontWeight.w500),
                     ),
                   ),
                   if (isAdult) ...[
                     const SizedBox(width: 16),
-                    const Text(
-                      '🔞',
-                      style: TextStyle(fontSize: 18),
-                    ),
+                    const Badge(label: Text('18+')),
                   ]
                 ],
               ),
-              const SizedBox(height: 12),
+              const SizedBox(height: 8),
               Row(
                 mainAxisAlignment: MainAxisAlignment.start,
                 children: [
                   if (authorGender != null) ...[
-                    Icon(authorGender == Gender.male ? Icons.male_rounded : Icons.female_rounded),
+                    Icon(
+                      authorGender == Gender.male ? Icons.face_6_rounded : Icons.face_3_rounded,
+                      color: context.getColorScheme().secondary,
+                    ),
                     const SizedBox(width: 4),
                     Text(authorGender!.display()),
-                    const SizedBox(width: 12),
+                    const SizedBox(width: 8),
                   ],
                   if (authorAge != null) ...[
-                    const Icon(Icons.calendar_month_outlined), // maybe cake
+                    Icon(
+                      Icons.calendar_month_outlined,
+                      color: context.getColorScheme().secondary,
+                    ), // maybe cake
                     const SizedBox(width: 4),
                     Text(authorAge!.toString()),
-                    const SizedBox(width: 12),
+                    const SizedBox(width: 8),
                   ],
                   if (authorLocation != null) ...[
-                    const Icon(Icons.location_on_outlined),
+                    Icon(Icons.location_on_outlined, color: context.getColorScheme().secondary),
                     const SizedBox(width: 4),
                     Flexible(
                       child: Text(
@@ -80,12 +84,12 @@ class ThematicChatCard extends StatelessWidget {
                   ],
                 ],
               ),
-              const SizedBox(height: 12),
+              const SizedBox(height: 8),
               const Divider(),
-              const SizedBox(height: 12),
+              const SizedBox(height: 8),
               Text(
                 description,
-                style: const TextStyle(fontSize: 16),
+                style: const TextStyle(fontSize: 12),
               ),
               const SizedBox(height: 8),
               Row(
@@ -93,7 +97,9 @@ class ThematicChatCard extends StatelessWidget {
                 children: [
                   OutlinedButton.icon(
                     onPressed: () {},
-                    icon: hasQuestions ? const Icon(Icons.lock) : const Icon(Icons.chevron_right_rounded),
+                    icon: hasQuestions
+                        ? const Icon(Icons.key_outlined)
+                        : const Icon(Icons.chevron_right_rounded),
                     label: const Text("З'єднати"),
                   ),
                 ],

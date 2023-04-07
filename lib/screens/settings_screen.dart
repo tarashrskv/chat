@@ -20,6 +20,7 @@ class _SettingsScreenState extends State<SettingsScreen> {
     return Column(
       children: [
         SwitchListTile(
+          secondary: Icon(Icons.dark_mode_outlined),
           contentPadding: EdgeInsets.zero,
           title: Text('Використовувати темну тему'),
           value: themeModeNotifier.themeMode == ThemeMode.dark,

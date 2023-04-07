@@ -13,19 +13,6 @@ class AppScreen extends StatefulWidget {
 }
 
 class _AppScreenState extends State<AppScreen> {
-  static const Map<NavBarItem, List<NavBarItem>> _navBarItemOrder = {
-    NavBarItem.regularSearch: [
-      NavBarItem.regularSearch,
-      NavBarItem.thematicChats,
-      NavBarItem.settings,
-    ],
-    NavBarItem.thematicChats: [
-      NavBarItem.thematicChats,
-      NavBarItem.regularSearch,
-      NavBarItem.settings,
-    ],
-  };
-
   int _selectedNavigationItemIndex = 0;
 
   @override
@@ -64,7 +51,11 @@ class _AppScreenState extends State<AppScreen> {
   Widget _buildBottomNavBar(NavBarItem defaultNavBarItem) {
     return NavigationBar(
       destinations: getDestinations(defaultNavBarItem).toList(),
-      onDestinationSelected: _onNavigationItemTapped,
+      onDestinationSelected: (index) {
+        setState(() {
+          _selectedNavigationItemIndex = index;
+        });
+      },
       selectedIndex: _selectedNavigationItemIndex,
     );
   }
@@ -75,8 +66,8 @@ class _AppScreenState extends State<AppScreen> {
             (defaultNavBarItem == NavBarItem.thematicChats && _selectedNavigationItemIndex == 1);
     final regularChatNavBarItem = NavigationDestination(
       icon: regularChatActive
-          ? const Icon(Icons.chat_bubble_rounded)
-          : const Icon(Icons.chat_bubble_outline_rounded),
+          ? const Icon(Icons.question_answer_rounded)
+          : const Icon(Icons.question_answer_outlined),
       label: 'Звичайні',
     );
 
@@ -85,8 +76,8 @@ class _AppScreenState extends State<AppScreen> {
             (defaultNavBarItem == NavBarItem.regularSearch && _selectedNavigationItemIndex == 1);
     final thematicChatsNavBarItem = NavigationDestination(
       icon: isThematicChatActive
-          ? const Icon(Icons.lightbulb_rounded)
-          : const Icon(Icons.lightbulb_outline_rounded),
+          ? const Icon(Icons.interests_rounded)
+          : const Icon(Icons.interests_outlined),
       label: 'Тематичні',
     );
 
@@ -104,15 +95,5 @@ class _AppScreenState extends State<AppScreen> {
           : const Icon(Icons.settings_outlined),
       label: 'Налаштування',
     );
-  }
-
-  void _onNavigationItemTapped(int index) {
-    setState(() {
-      _selectedNavigationItemIndex = index;
-    });
-  }
-
-  NavBarItem _getCurrentNavBarItem(NavBarItem defaultNavBarItem) {
-    return _navBarItemOrder[defaultNavBarItem]![_selectedNavigationItemIndex];
   }
 }

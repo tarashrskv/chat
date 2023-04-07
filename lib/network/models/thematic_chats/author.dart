@@ -3,16 +3,16 @@ import 'package:chat/models/gender.dart';
 class Author {
   final Gender? gender;
   final int? age;
-  final String? geo;
+  final String? location;
 
-  Author({this.gender, this.age, this.geo});
+  Author({this.gender, this.age, this.location});
 
   factory Author.fromJson(Map<String, dynamic> json) {
 
     return Author(
       gender: _getGender(json['gender']),
       age: json['age'],
-      geo: json['geo'],
+      location: json['geo'],
     );
   }
 

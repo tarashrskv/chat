@@ -1,4 +1,5 @@
-import 'package:flutter/widgets.dart';
+
+import 'package:flutter/material.dart';
 
 class AppScreenHeaderDelegate extends SliverPersistentHeaderDelegate {
 
@@ -6,10 +7,10 @@ class AppScreenHeaderDelegate extends SliverPersistentHeaderDelegate {
   static const double progressThreshold = 0.5;
 
   @override
-  double get maxExtent => 112;
+  double get maxExtent => 24;
 
   @override
-  double get minExtent => 56;
+  double get minExtent => 24;
 
   @override
   Widget build(BuildContext context, double shrinkOffset, bool overlapsContent) {
@@ -18,7 +19,13 @@ class AppScreenHeaderDelegate extends SliverPersistentHeaderDelegate {
     final padding = _calculatePadding(progress);
     final opacity = _calculateOpacity(progress);
 
-    return Container();
+    return Row(
+      mainAxisAlignment: MainAxisAlignment.start,
+      crossAxisAlignment: CrossAxisAlignment.start,
+      children: [
+      IconButton(onPressed: Navigator.of(context).pop, icon: const Icon(Icons.close_rounded)),
+
+    ],);
   }
 
   @override
