@@ -94,19 +94,58 @@ class _ThematicChatsScreenState extends State<ThematicChatsScreen> {
     return FloatingActionButton.extended(
       onPressed: () {
         showDialog(
-            context: context,
-            builder: (_) {
-              return Dialog.fullscreen(
-                  child: Padding(
-                    padding: const EdgeInsets.all(0),
-                    child: CustomScrollView(
-                      slivers: [
-                        SliverPersistentHeader(delegate: AppScreenHeaderDelegate())
+          context: context,
+          builder: (_) {
+            return Dialog.fullscreen(
+              child: SingleChildScrollView(
+                child: Column(
+                  children: [
+                    Row(
+                      children: [
+                        IconButton(
+                            onPressed: Navigator.of(context).pop,
+                            icon: const Icon(Icons.close_rounded)),
+                        Text(
+                          'Створити чат',
+                          style: const TextStyle(fontSize: 22),
+                        ),
+                        const Spacer(),
+                        TextButton(onPressed: () {}, child: Text('Ок'))
                       ],
                     ),
-                  ),
-              );
-            });
+                    Padding(
+                      padding: EdgeInsets.all(16),
+                      child: Column(
+                        children: [
+                          TextFormField(),
+                          TextFormField(),
+                          Row(
+                            children: [
+                              Expanded(child: TextFormField()),
+                              const SizedBox(
+                                width: 16,
+                              ),
+                              Expanded(child: TextFormField())
+                            ],
+                          ),
+                          TextFormField(),
+                          CheckboxListTile(
+                            title: Text('Без обмежень'),
+                              subtitle: Text('Позначай цей прапорець, якщо тема стосується інтиму, «вірту», відвертощів пікантного характеру, еротики, контенту «для дорослих», NSFW тощо.'),
+                              value: true, onChanged: (_) {},),
+                          CheckboxListTile(
+                            title: Text('Не впускати нових користувачів'),
+                            subtitle: Text('Не впустить у твій діалог користувачів, які тільки-но завітали на сайт (менше 20хв тому). Допоможе, коли тебе атакують, обходячи блокування.'),
+                            value: true, onChanged: (_) {},),
+                        ],
+                      ),
+                    ),
+                  ],
+                ),
+              ),
+            );
+          },
+        );
       },
       label: const Text('Створити'),
       icon: const Icon(Icons.add),

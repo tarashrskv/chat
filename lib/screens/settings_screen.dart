@@ -1,7 +1,6 @@
 import 'package:chat/providers/default_nav_bar_item_notifier.dart';
 import 'package:chat/theme/theme_mode_notifier.dart';
 import 'package:flutter/material.dart';
-import 'package:flutter/widgets.dart';
 import 'package:provider/provider.dart';
 
 class SettingsScreen extends StatefulWidget {
@@ -20,15 +19,15 @@ class _SettingsScreenState extends State<SettingsScreen> {
     return Column(
       children: [
         SwitchListTile(
-          secondary: Icon(Icons.dark_mode_outlined),
+          secondary: const Icon(Icons.dark_mode_outlined),
           contentPadding: EdgeInsets.zero,
-          title: Text('Використовувати темну тему'),
+          title: const Text('Використовувати темну тему'),
           value: themeModeNotifier.themeMode == ThemeMode.dark,
           onChanged: (_) => themeModeNotifier.toggleThemeMode(),
         ),
         SwitchListTile(
           contentPadding: EdgeInsets.zero,
-          title: Text('Тематичні діалоги за замовчуванням'),
+          title: const Text('Тематичні діалоги за замовчуванням'),
           value: defaultNavBarItemNotifier.defaultNavigationBarItem == NavBarItem.thematicChats,
           onChanged: (_) => defaultNavBarItemNotifier.toggleUseThematicChatsByDefault(),
         ),
