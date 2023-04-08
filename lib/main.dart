@@ -6,11 +6,11 @@ import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 
 void main() {
-  runApp(const MyApp());
+  runApp(const ChatMaterialApp());
 }
 
-class MyApp extends StatelessWidget {
-  const MyApp({super.key});
+class ChatMaterialApp extends StatelessWidget {
+  const ChatMaterialApp({super.key});
 
   // This widget is the root of your application.
   @override

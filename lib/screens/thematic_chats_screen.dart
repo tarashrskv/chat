@@ -1,12 +1,6 @@
-import 'dart:async';
-import 'dart:convert';
-import 'package:chat/models/gender.dart';
-import 'package:chat/network/models/thematic_chats/author.dart';
-import 'package:chat/widgets/app_screen_header_delegate.dart';
-import 'package:chat/widgets/styles.dart';
-import 'package:flutter/services.dart';
-import 'package:http/http.dart' as http;
-
+import 'package:chat/network/api/socket_api.dart';
+import 'package:chat/widgets/extensions/context_x.dart';
+import 'package:chat/widgets/full_screen_dialog.dart';
 import 'package:chat/network/models/thematic_chats/thematic_chat.dart';
 import 'package:chat/widgets/thematic_chat_card.dart';
 import 'package:flutter/material.dart';
@@ -20,6 +14,9 @@ class ThematicChatsScreen extends StatefulWidget {
 
 class _ThematicChatsScreenState extends State<ThematicChatsScreen> {
   final ValueNotifier<List<ThematicChat>> _chats = ValueNotifier([]);
+  final ValueNotifier<int?> _onlineCount = ValueNotifier(null);
+
+  late final SocketApi _thematicChatsApi;
 
   late bool _isFirstConnection;
 
@@ -29,12 +26,44 @@ class _ThematicChatsScreenState extends State<ThematicChatsScreen> {
 
     _isFirstConnection = true;
 
-    fetchChats();
+    _thematicChatsApi = SocketApi('thematic')
+      ..on('thematics.all', _rebuildChats)
+      ..on('thematics.online', _rebuildOnlineCount)
+      ..connect();
   }
 
   @override
   Widget build(BuildContext context) {
     return Scaffold(
+      appBar: AppBar(
+        actions: [
+          if (_onlineCount.value != null) ...[
+            const SizedBox(width: 16),
+            const Icon(Icons.remove_red_eye_outlined),
+            const SizedBox(width: 4),
+            Text(_onlineCount.value!.toString()),
+            const Spacer(),
+          ],
+          if (_chats.value.isNotEmpty) ...[
+            ElevatedButton.icon(
+              onPressed: () {},
+              icon: const Icon(Icons.filter_alt_outlined),
+              label: Text(
+                'Фільтр',
+              ),
+            ),
+            const SizedBox(width: 8),
+            ElevatedButton.icon(
+              onPressed: () {},
+              icon: const Icon(Icons.sort_rounded),
+              label: Text(
+                'Спочатку новіші',
+              ),
+            ),
+            const SizedBox(width: 16),
+          ],
+        ],
+      ),
       body: ValueListenableBuilder(
         valueListenable: _chats,
         builder: (_, chats, __) {
@@ -66,30 +95,13 @@ class _ThematicChatsScreenState extends State<ThematicChatsScreen> {
     );
   }
 
-  Future<List<ThematicChat>> fetchChats() async {
-    while (true) {
-      await Future.delayed(Duration(seconds: 1));
-      _chats.value = [
-        ThematicChat(
-          title: 'Го палити дивани?',
-          // 40
-          description:
-              'Неважливо, хто ти, звідки, скільки років і звідки знаєш про цей чат. Давай просто відірвемось бігом!',
-          // 500
-          author: Author(gender: Gender.male, age: 27, location: 'Івано-Франківськ'),
-          // 30
-          questions: [],
-          // 3 max
-          adultOnly: false,
-          uuid: '',
-        ),
-      ];
-      if (_isFirstConnection) {
-        setState(() {
-          _isFirstConnection = false;
-        });
-      }
-    }
+  @override
+  void dispose() {
+    _chats.dispose();
+    _onlineCount.dispose();
+    _thematicChatsApi.dispose();
+
+    super.dispose();
   }
 
   FloatingActionButton _buildFab() {
@@ -99,108 +111,7 @@ class _ThematicChatsScreenState extends State<ThematicChatsScreen> {
           context: context,
           builder: (_) {
             return Dialog.fullscreen(
-              child: SingleChildScrollView(
-                child: Column(
-                  children: [
-                    Row(
-                      children: [
-                        IconButton(
-                            onPressed: Navigator.of(context).pop,
-                            icon: const Icon(Icons.close_rounded)),
-                        Text(
-                          'Створити чат',
-                          style: const TextStyle(fontSize: 22),
-                        ),
-                        const Spacer(),
-                        TextButton(onPressed: () {}, child: Text('Ок'))
-                      ],
-                    ),
-                    Padding(
-                      padding: const EdgeInsets.all(16),
-                      child: Column(
-                        children: [
-                          TextFormField(
-                            maxLength: 40,
-                            maxLines: null,
-                            maxLengthEnforcement: MaxLengthEnforcement.enforced,
-                            textInputAction: TextInputAction.next,
-                            textCapitalization: TextCapitalization.sentences,
-                            decoration: InputDecoration(
-                              labelText: 'Заголовок',
-                                helperMaxLines: 2,
-                                helperText: 'Наприклад: поговорю про фільми, шукаю компанію, потрібна порада тощо.'
-                            ),
-                          ),
-                          const SizedBox(height: 16),
-                          TextFormField(
-                            maxLength: 100,
-                            maxLines: null,
-                            maxLengthEnforcement: MaxLengthEnforcement.enforced,
-                            textInputAction: TextInputAction.next,
-                            textCapitalization: TextCapitalization.sentences,
-                            decoration: InputDecoration(
-                              labelText: 'Опис чату',
-                                helperMaxLines: 2,
-                                helperText: 'Можна вказати чим цікавишся, з ким хочеться поговорити або інші деталі.'
-                            ),
-                          ),
-                          const SizedBox(height: 16),
-                          const Divider(),
-                          const SizedBox(height: 16),
-                          Row(
-                            children: [
-                              Expanded(child: TextFormField(
-                                keyboardType: TextInputType.number,
-                                decoration: textFieldDecoration.copyWith(
-                                  labelText: 'Твій вік',
-                                ),
-                              )),
-                              const SizedBox(
-                                width: 16,
-                              ),
-                              Expanded(child: TextFormField(
-                                decoration: textFieldDecoration.copyWith(
-                                  labelText: 'Твоя стать',
-                                  floatingLabelBehavior: FloatingLabelBehavior.always,
-                                  suffixIcon: const Icon(Icons.arrow_drop_down_rounded),
-                                ),
-                              ),),
-                            ],
-                          ),
-                          const SizedBox(height: 16),
-                          TextFormField(
-                              decoration: textFieldDecoration.copyWith(
-                                labelText: true ? 'Введи регіон пошуку' : 'Регіон пошуку',
-                                helperMaxLines: 2,
-                                helperText: 'Назва твого міста або, наприклад, те, що ти в повній жопі.'
-                              ),
-                          ),
-                          const SizedBox(height: 16),
-                          const Divider(),
-                          const SizedBox(height: 16),
-                          CheckboxListTile(
-                            title: Text('Без обмежень'),
-                            subtitle: Text(
-                                'Позначай цей прапорець, якщо тема стосується інтиму, «вірту», відвертощів пікантного характеру, еротики, контенту «для дорослих», NSFW тощо.'),
-                            value: true,
-                            onChanged: (_) {},
-                          ),
-                          CheckboxListTile(
-                            title: Text('Не впускати нових користувачів'),
-                            subtitle: Text(
-                                'Не впустить у твій діалог користувачів, які тільки-но завітали на сайт (менше 20хв тому). Допоможе, коли тебе атакують, обходячи блокування.'),
-                            value: true,
-                            onChanged: (_) {},
-                          ),
-                          const SizedBox(height: 16),
-                          const Divider(),
-                          const SizedBox(height: 16),
-                        ],
-                      ),
-                    ),
-                  ],
-                ),
-              ),
+              child: FullScreenDialog(),
             );
           },
         );
@@ -209,22 +120,16 @@ class _ThematicChatsScreenState extends State<ThematicChatsScreen> {
       icon: const Icon(Icons.add),
     );
   }
+
+  void _rebuildChats(dynamic chats) {
+    _chats.value = List<ThematicChat>.from((chats).map((chat) => ThematicChat.fromJson(chat)));
+
+    if (_isFirstConnection) {
+      setState(() => _isFirstConnection = false);
+    }
+  }
+
+  void _rebuildOnlineCount(dynamic onlineCount) {
+    _onlineCount.value = onlineCount as int?;
+  }
 }
-
-// ThematicChatCard(
-// title: 'Го палити дивани?', // 40
-// description: 'Неважливо, хто ти, звідки, скільки років і звідки знаєш про цей чат. Давай просто відірвемось бігом!', // 500
-// authorGender: Gender.male,
-// authorAge: 27, // 0-99
-// authorLocation: 'Івано-Франківськ', // 30
-// hasQuestions: false,
-// isAdult: false
-// ),
-
-//while (true) {
-//final response = await http.get(Uri.parse('https://lfyou.com.ua/api/thematic'));
-//if (response.statusCode == 200) {
-//final decodedBody = utf8.decode(response.bodyBytes);
-//final s = List<ThematicChat>.from(jsonDecode(decodedBody)['chats'].map((chat) => ThematicChat.fromJson(chat)));
-// ...
-//_chats.value = s

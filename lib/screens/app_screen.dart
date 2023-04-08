@@ -2,6 +2,7 @@ import 'package:chat/providers/default_nav_bar_item_notifier.dart';
 import 'package:chat/screens/regular_search_screen.dart';
 import 'package:chat/screens/settings_screen.dart';
 import 'package:chat/screens/thematic_chats_screen.dart';
+import 'package:chat/widgets/extensions/context_x.dart';
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 
@@ -24,8 +25,7 @@ class _AppScreenState extends State<AppScreen> {
         builder: (_, provider, __) {
           return Scaffold(
             appBar: AppBar(
-              toolbarHeight: 30,
-              scrolledUnderElevation: 0,
+              toolbarHeight: 0,
             ),
             body: _getContent(provider.defaultNavigationBarItem),
             bottomNavigationBar: _buildBottomNavBar(provider.defaultNavigationBarItem),
