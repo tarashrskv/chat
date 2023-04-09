@@ -2,7 +2,7 @@ import 'author.dart';
 import 'question.dart';
 
 class ThematicChat {
-  final String uuid;
+  final String id;
   final Author author;
   //final String? createError;
   // final bool simplifyForm;
@@ -14,7 +14,7 @@ class ThematicChat {
   final bool? restrictNewbies;
 
   ThematicChat({
-    required this.uuid,
+    required this.id,
     required this.title,
     required this.description,
     required this.author,
@@ -28,7 +28,7 @@ class ThematicChat {
 
   factory ThematicChat.fromJson(Map<String, dynamic> json) {
     return ThematicChat(
-      uuid: json['uuid'],
+      id: json['uuid'],
       title: json['title'],
       description: json['description'],
       author: Author.fromJson(json['author']),
