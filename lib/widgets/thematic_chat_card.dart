@@ -1,4 +1,5 @@
 import 'package:chat/models/gender.dart';
+import 'package:chat/network/models/thematic_chats/question.dart';
 import 'package:chat/widgets/extensions/context_x.dart';
 import 'package:flutter/material.dart';
 
@@ -8,8 +9,8 @@ class ThematicChatCard extends StatelessWidget {
   final Gender? authorGender;
   final int? authorAge;
   final String? authorLocation;
-  final bool hasQuestions;
-  final bool isAdult;
+  final List<Question>? questions;
+  final bool adultOnly;
 
   const ThematicChatCard({
     super.key,
@@ -18,8 +19,8 @@ class ThematicChatCard extends StatelessWidget {
     required this.authorGender,
     required this.authorAge,
     required this.authorLocation,
-    required this.hasQuestions,
-    required this.isAdult,
+    required this.questions,
+    required this.adultOnly,
   });
 
   @override
@@ -42,7 +43,7 @@ class ThematicChatCard extends StatelessWidget {
                       style: const TextStyle(fontSize: 16, fontWeight: FontWeight.w500),
                     ),
                   ),
-                  if (isAdult) ...[
+                  if (adultOnly) ...[
                     const SizedBox(width: 16),
                     const Badge(label: Text('18+')),
                   ]
@@ -97,9 +98,7 @@ class ThematicChatCard extends StatelessWidget {
                 children: [
                   OutlinedButton.icon(
                     onPressed: () {},
-                    icon: hasQuestions
-                        ? const Icon(Icons.key_outlined)
-                        : const Icon(Icons.chevron_right_rounded),
+                    icon: (questions?.isEmpty ?? true) ? const Icon(Icons.chevron_right_rounded) : const Icon(Icons.key_outlined),
                     label: const Text("З'єднати"),
                   ),
                 ],

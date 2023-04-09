@@ -27,7 +27,8 @@ class _ThematicChatsScreenState extends State<ThematicChatsScreen> {
     _isFirstConnection = true;
 
     _thematicChatsApi = SocketApi('thematic')
-      ..on('thematics.all', _rebuildChats)
+      ..on('thematics.all', _buildChats)
+      ..on('thematics.new', _addChat)
       ..on('thematics.online', _rebuildOnlineCount)
       ..connect();
   }
@@ -36,71 +37,77 @@ class _ThematicChatsScreenState extends State<ThematicChatsScreen> {
   Widget build(BuildContext context) {
     final scrollController = ScrollController();
     return Scaffold(
-      body: CustomScrollView(
-        controller: scrollController,
-        physics: const AlwaysScrollableScrollPhysics(parent: BouncingScrollPhysics()),
-        slivers: [
-          SliverAppBar(
-            toolbarHeight: 56,
-            collapsedHeight: 56,
-            scrolledUnderElevation: 4,
-            pinned: false,
-            stretch: false,
-            floating: false,
-            actions: [
-              if (_onlineCount.value != null) ...[
-                const SizedBox(width: 16),
-                const Icon(Icons.remove_red_eye_outlined),
-                const SizedBox(width: 4),
-                Text(_onlineCount.value!.toString()),
-                const Spacer(),
-              ],
-              if (_chats.value.isNotEmpty) ...[
-                ElevatedButton.icon(
-                  onPressed: _showFilterDialog,
-                  icon: const Icon(Icons.filter_alt_outlined),
-                  label: Text('Фільтр'),
-                ),
-                const SizedBox(width: 8),
-                ElevatedButton.icon(
-                  onPressed: () {},
-                  icon: const Icon(Icons.sort_rounded),
-                  label: Text('Сортування'),
-                ),
-                const SizedBox(width: 16),
-              ],
-            ],
-          ),
-          SliverFillRemaining(
-          child: ValueListenableBuilder(
-            valueListenable: _chats,
-            builder: (_, chats, __) {
-              if (_isFirstConnection) return const Center(child: CircularProgressIndicator());
-              return Scrollbar(
-                controller: scrollController,
-                thumbVisibility: true,
-                child: ListView.separated(
-                  itemCount: chats.length,
-                  itemBuilder: (context, index) {
-                    return Padding(
-                      padding: const EdgeInsets.symmetric(horizontal: 16),
-                      child: ThematicChatCard(
-                        title: chats[index].title,
-                        description: chats[index].description,
-                        authorGender: chats[index].author.gender,
-                        authorAge: chats[index].author.age,
-                        authorLocation: chats[index].author.location,
-                        hasQuestions: chats[index].questions == null,
-                        isAdult: chats[index].adultOnly == true,
+      body: ValueListenableBuilder(
+        valueListenable: _chats,
+        builder: (_, chats, __) {
+          if (chats.isEmpty) {
+            return const Center(child: CircularProgressIndicator());
+          }
+
+          return Scrollbar(
+            controller: scrollController,
+            child: CustomScrollView(
+              controller: scrollController,
+              physics: const AlwaysScrollableScrollPhysics(parent: BouncingScrollPhysics()),
+              slivers: [
+                SliverAppBar(
+                  toolbarHeight: 56,
+                  collapsedHeight: 56,
+                  scrolledUnderElevation: 4,
+                  pinned: false,
+                  floating: true,
+                  snap: false,
+                  stretch: true,
+                  actions: [
+                    if (_onlineCount.value != null) ...[
+                      const SizedBox(width: 16),
+                      const Icon(Icons.remove_red_eye_outlined),
+                      const SizedBox(width: 4),
+                      Text(_onlineCount.value!.toString()),
+                      const Spacer(),
+                    ],
+                    if (_chats.value.isNotEmpty) ...[
+                      ElevatedButton.icon(
+                        onPressed: _showFilterDialog,
+                        icon: const Icon(Icons.filter_alt_outlined),
+                        label: Text('Фільтр'),
                       ),
-                    );
-                  },
-                  separatorBuilder: (_, __) => const SizedBox(height: 4),
+                      const SizedBox(width: 8),
+                      ElevatedButton.icon(
+                        onPressed: () {},
+                        icon: const Icon(Icons.sort_rounded),
+                        label: Text('Сортування'),
+                      ),
+                      const SizedBox(width: 16),
+                    ],
+                  ],
                 ),
-              );
-            },
-          ),
-        )],
+                SliverList(
+
+                  delegate: SliverChildBuilderDelegate(
+                    (BuildContext context, int index) {
+                      final chat = chats[index];
+                          return Padding(
+                            padding: const EdgeInsets.symmetric(horizontal: 16),
+                            child: ThematicChatCard(
+                              title: chat.title,
+                              description: chat.description,
+                              authorGender: chat.author.gender,
+                              authorAge: chat.author.age,
+                              authorLocation: chat.author.location,
+                              questions: chat.questions,
+                              adultOnly: chat.adultOnly == true,
+                            ),
+                          );
+                    },
+                    childCount:
+                        _chats.value.length,
+                  ),
+                ),
+              ],
+            ),
+          );
+        },
       ),
       floatingActionButton: _buildFab(),
     );
@@ -132,8 +139,20 @@ class _ThematicChatsScreenState extends State<ThematicChatsScreen> {
     );
   }
 
-  void _rebuildChats(dynamic chats) {
-    _chats.value = List<ThematicChat>.from((chats).map((chat) => ThematicChat.fromJson(chat)));
+  void _buildChats(dynamic chats) {
+    print(chats.length);
+
+    _chats.value =
+        List<ThematicChat>.from(chats.map((chat) => ThematicChat.fromJson(chat))).reversed.toList();
+
+    if (_isFirstConnection) {
+      setState(() => _isFirstConnection = false);
+    }
+  }
+
+  void _addChat(dynamic chat) {
+    final s = ThematicChat.fromJson(chat);
+    _chats.value = _chats.value.toList()..insert(0, s);
 
     if (_isFirstConnection) {
       setState(() => _isFirstConnection = false);
@@ -145,14 +164,16 @@ class _ThematicChatsScreenState extends State<ThematicChatsScreen> {
   }
 
   void _showFilterDialog() {
-    showDialog(context: context, builder: (_) {
-      return AlertDialog(
-        title: Text('Сортування'),
-        actions: [
-          TextButton(onPressed: Navigator.of(context).pop, child: Text('Скасувати')),
-          TextButton(onPressed: Navigator.of(context).pop, child: Text('Ок')),
-        ],
-      );
-    });
+    showDialog(
+        context: context,
+        builder: (_) {
+          return AlertDialog(
+            title: Text('Сортування'),
+            actions: [
+              TextButton(onPressed: Navigator.of(context).pop, child: Text('Скасувати')),
+              TextButton(onPressed: Navigator.of(context).pop, child: Text('Ок')),
+            ],
+          );
+        },);
   }
 }
