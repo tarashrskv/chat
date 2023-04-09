@@ -39,10 +39,8 @@ class _RegularSearchScreenState extends State<RegularSearchScreen> {
     final lookingForGenders = {Gender.female};
     final lookingForAgeRanges = {AgeRange.twentyOneToTwentyFive, AgeRange.twentySixAndMore};
 
-    _lookingForGenders = ValueNotifier(lookingForGenders)
-      ..addListener(_setCanPerformSearch);
-    _lookingForAgeRanges = ValueNotifier(lookingForAgeRanges)
-      ..addListener(_setCanPerformSearch);
+    _lookingForGenders = ValueNotifier(lookingForGenders)..addListener(_setCanPerformSearch);
+    _lookingForAgeRanges = ValueNotifier(lookingForAgeRanges)..addListener(_setCanPerformSearch);
 
     const searchRegion = Region.ivanoFrankivsk;
     const chatMode = ChatMode.regular;
@@ -58,35 +56,31 @@ class _RegularSearchScreenState extends State<RegularSearchScreen> {
   @override
   Widget build(BuildContext context) {
     return CustomScrollView(
-      physics: const AlwaysScrollableScrollPhysics(),
+      physics: const AlwaysScrollableScrollPhysics(parent: BouncingScrollPhysics()),
       slivers: [
         SliverToBoxAdapter(
-          child: Column(
-            crossAxisAlignment: CrossAxisAlignment.stretch,
-            children: [
-              SearchInfo(
-                myGender: _myGender,
-                myAgeRange: _myAgeRange,
-                lookingForGenders: _lookingForGenders,
-                lookingForAgeRanges: _lookingForAgeRanges,
-                searchRegion: _searchRegion,
-                chatMode: _chatMode,
-              ),
-            ],
+          child: SearchInfo(
+            myGender: _myGender,
+            myAgeRange: _myAgeRange,
+            lookingForGenders: _lookingForGenders,
+            lookingForAgeRanges: _lookingForAgeRanges,
+            searchRegion: _searchRegion,
+            chatMode: _chatMode,
           ),
         ),
         SliverFillRemaining(
           hasScrollBody: false,
           child: Align(
-              alignment: Alignment.bottomCenter,
-              child: Padding(
-                padding: const EdgeInsets.all(8.0),
-                child: FilledButton.icon(
-                  onPressed: _canPerformSearch ? () {} : null,
-                  icon: const Icon(Icons.search_rounded),
-                  label: const Text('Шукати співрозмовника'),
-                ),
-              )),
+            alignment: Alignment.bottomCenter,
+            child: Padding(
+              padding: const EdgeInsets.all(8.0),
+              child: FilledButton.icon(
+                onPressed: _canPerformSearch ? () {} : null,
+                icon: const Icon(Icons.search_rounded),
+                label: const Text('Шукати співрозмовника'),
+              ),
+            ),
+          ),
         ),
       ],
     );

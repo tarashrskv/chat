@@ -98,30 +98,44 @@ class _SearchInfoState extends State<SearchInfo> {
               showDialog(
                 context: context,
                 builder: (context) {
-                  return SimpleDialog(
+                  Region? selectedRegion = widget.searchRegion.value;
+                  return AlertDialog(
+                    icon: Icon(
+                      Icons.travel_explore_outlined,
+                      color: context.getColorScheme().secondary,
+                    ),
                     title: Column(
-                      children: [
-                        Center(
-                          child: Icon(
-                            Icons.travel_explore_outlined,
-                            color: context.getColorScheme().secondary,
-                          ),
-                        ),
-                        const SizedBox(height: 12),
-                        const Text('Вибери область'),
-                        const SizedBox(height: 12),
-                        const Divider(),
+                      children: const [
+                        Text('Вибери область'),
+                        SizedBox(height: 12),
+                        Divider(),
                       ],
                     ),
-                    children: [
-                      for (final region in getFrequentRegions().followedBy(getOtherRegions()))
-                        SimpleDialogOption(
-                          onPressed: () {
-                            widget.searchRegion.value = region;
-                            Navigator.of(context).pop();
-                          },
-                          child: Text(region.displayValue),
-                        ),
+                    content: SingleChildScrollView(
+                      child: Column(
+                        children: [
+                          for (final region in getFrequentRegions().followedBy(getOtherRegions()))
+                            RadioListTile(
+                              visualDensity: VisualDensity.compact,
+                              contentPadding: EdgeInsets.zero,
+                              value: region,
+                              groupValue: selectedRegion,
+                              onChanged: (region) => selectedRegion = region,
+                              title: Text(region.displayValue),
+                            ),
+                        ],
+                      ),
+                    ),
+                    actions: [
+                      TextButton(onPressed: Navigator.of(context).pop, child: Text('Скасувати')),
+                      TextButton(
+                        onPressed: () {
+                          if (selectedRegion != null) {
+                            widget.searchRegion.value = selectedRegion;
+                          }
+                        },
+                        child: Text('Ок'),
+                      ),
                     ],
                   );
                 },
