@@ -33,84 +33,88 @@ class ThematicChatCard extends StatelessWidget {
     return SizeTransition(
       sizeFactor: animation,
       child: Card(
-        child: InkWell(
-          borderRadius: BorderRadius.circular(12),
-          onLongPress: isActive ? () {} : null,
-          child: Padding(
-            padding: const EdgeInsets.all(16),
-            child: Column(
-              crossAxisAlignment: CrossAxisAlignment.start,
-              children: [
-                Row(
-                  crossAxisAlignment: CrossAxisAlignment.start,
-                  children: [
-                    Expanded(
-                      child: Text(
-                        title,
-                        style: const TextStyle(fontSize: 16, fontWeight: FontWeight.w500),
-                      ),
-                    ),
-                    if (adultOnly) ...[
-                      const SizedBox(width: 16),
-                      const Badge(label: Text('18+')),
-                    ]
-                  ],
-                ),
-                const SizedBox(height: 8),
-                Row(
-                  mainAxisAlignment: MainAxisAlignment.start,
-                  children: [
-                    if (authorGender != null) ...[
-                      Icon(
-                        authorGender == Gender.male ? Icons.face_6_rounded : Icons.face_3_rounded,
-                        color: context.getColorScheme().secondary,
-                      ),
-                      const SizedBox(width: 4),
-                      Text(authorGender!.display()),
-                      const SizedBox(width: 8),
-                    ],
-                    if (authorAge != null) ...[
-                      Icon(
-                        Icons.calendar_month_outlined,
-                        color: context.getColorScheme().secondary,
-                      ), // maybe cake
-                      const SizedBox(width: 4),
-                      Text(authorAge!.toString()),
-                      const SizedBox(width: 8),
-                    ],
-                    if (authorLocation != null) ...[
-                      Icon(Icons.location_on_outlined, color: context.getColorScheme().secondary),
-                      const SizedBox(width: 4),
-                      Flexible(
+        elevation: isActive ? CardTheme.of(context).elevation : 0,
+        child: Opacity(
+          opacity: isActive ? 1 : 0.38,
+          child: InkWell(
+            borderRadius: BorderRadius.circular(12),
+            onLongPress: isActive ? () {} : null,
+            child: Padding(
+              padding: const EdgeInsets.all(16),
+              child: Column(
+                crossAxisAlignment: CrossAxisAlignment.start,
+                children: [
+                  Row(
+                    crossAxisAlignment: CrossAxisAlignment.start,
+                    children: [
+                      Expanded(
                         child: Text(
-                          authorLocation!,
-                          overflow: TextOverflow.ellipsis,
-                          softWrap: true,
-                          maxLines: 2,
+                          title,
+                          style: const TextStyle(fontSize: 16, fontWeight: FontWeight.w500),
                         ),
                       ),
+                      if (adultOnly) ...[
+                        const SizedBox(width: 16),
+                        const Badge(label: Text('18+')),
+                      ]
                     ],
-                  ],
-                ),
-                const SizedBox(height: 8),
-                const Divider(),
-                const SizedBox(height: 8),
-                Text(
-                  description,
-                  style: const TextStyle(fontSize: 12),
-                ),
-                const SizedBox(height: 8),
-                Row(
-                  mainAxisAlignment: MainAxisAlignment.end,
-                  children: [
-                    OutlinedButton.icon(
-                      onPressed: isActive ? () {} : null,
-                      icon: (questions?.isEmpty ?? true) ? const Icon(Icons.chevron_right_rounded) : const Icon(Icons.key_outlined),
-                      label: const Text("З'єднати"),
-                    ),
-                  ],
-                ),
-              ],
+                  ),
+                  const SizedBox(height: 8),
+                  Row(
+                    mainAxisAlignment: MainAxisAlignment.start,
+                    children: [
+                      if (authorGender != null) ...[
+                        Icon(
+                          authorGender == Gender.male ? Icons.face_6_rounded : Icons.face_3_rounded,
+                          color: context.getColorScheme().secondary,
+                        ),
+                        const SizedBox(width: 4),
+                        Text(authorGender!.display()),
+                        const SizedBox(width: 8),
+                      ],
+                      if (authorAge != null) ...[
+                        Icon(
+                          Icons.calendar_month_outlined,
+                          color: context.getColorScheme().secondary,
+                        ), // maybe cake
+                        const SizedBox(width: 4),
+                        Text(authorAge!.toString()),
+                        const SizedBox(width: 8),
+                      ],
+                      if (authorLocation != null) ...[
+                        Icon(Icons.location_on_outlined, color: context.getColorScheme().secondary),
+                        const SizedBox(width: 4),
+                        Flexible(
+                          child: Text(
+                            authorLocation!,
+                            overflow: TextOverflow.ellipsis,
+                            softWrap: true,
+                            maxLines: 2,
+                          ),
+                        ),
+                      ],
+                    ],
+                  ),
+                  const SizedBox(height: 8),
+                  const Divider(),
+                  const SizedBox(height: 8),
+                  Text(
+                    description,
+                    style: const TextStyle(fontSize: 12),
+                  ),
+                  const SizedBox(height: 8),
+                  ButtonBar(
+                    buttonPadding: EdgeInsets.zero,
+                    children: [
+                      OutlinedButton.icon(
+                        onPressed: isActive ? () {} : null,
+                        icon: (questions?.isEmpty ?? true) ? const Icon(Icons.chevron_right_rounded) : const Icon(Icons.key_outlined),
+                        label: const Text("З'єднати"),
+                      ),
+                    ]
+                  ),
+                ],
+              ),
             ),
           ),
         ),

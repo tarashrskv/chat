@@ -132,7 +132,7 @@ class _ThematicChatsScreenState extends State<ThematicChatsScreen> {
 
   void _rebuildChats(dynamic chats) {
     final chatsList =
-        List<ThematicChat>.from(chats.map((chat) => ThematicChat.fromJson(chat))).reversed.toList();
+        List<ThematicChat>.from(chats.map((chat) => ThematicChat.fromJson(chat))).where((element) => element.adultOnly != true).toList();
 
     setState(() {
       _chatsDisplayList = AnimatedListModel<ThematicChat>(

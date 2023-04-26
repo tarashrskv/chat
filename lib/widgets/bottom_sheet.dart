@@ -24,36 +24,40 @@ class ChatBottomSheet extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return Column(
-        mainAxisSize: MainAxisSize.min,
-        crossAxisAlignment: CrossAxisAlignment.stretch,
-        children: [
-          const SizedBox(height: 8),
-          Center(
-            child: Container(
-              width: 48,
-              height: 4,
-              decoration: BoxDecoration(
-                color: context.getColorScheme().onSurfaceVariant,
-                borderRadius: const BorderRadius.all(Radius.circular(2)),
-              ),
+      mainAxisSize: MainAxisSize.min,
+      crossAxisAlignment: CrossAxisAlignment.stretch,
+      children: [
+        const SizedBox(height: 8),
+        Center(
+          child: Container(
+            width: 48,
+            height: 4,
+            decoration: BoxDecoration(
+              color: context.getColorScheme().onSurfaceVariant,
+              borderRadius: const BorderRadius.all(Radius.circular(2)),
             ),
           ),
-          const SizedBox(height: 20),
-          if (title != null || onCancel != null || onProceed != null) ...[
-            _buildHeader(),
-          ],
-          const SizedBox(height: 12),
-          const Divider(
-            height: 1,
-            thickness: 1,
-            indent: 12,
-            endIndent: 12,
-          ),
-          Flexible(child: SingleChildScrollView(child: Padding(
-            padding: const EdgeInsets.all(16),
-            child: content,
-          ))),
+        ),
+        const SizedBox(height: 20),
+        if (title != null || onCancel != null || onProceed != null) ...[
+          _buildHeader(),
         ],
+        const SizedBox(height: 12),
+        const Divider(
+          height: 1,
+          thickness: 1,
+          indent: 12,
+          endIndent: 12,
+        ),
+        Flexible(
+          child: SingleChildScrollView(
+            child: Padding(
+              padding: const EdgeInsets.all(16),
+              child: content,
+            ),
+          ),
+        ),
+      ],
     );
   }
 
@@ -81,7 +85,9 @@ class ChatBottomSheet extends StatelessWidget {
               ),
             ),
           ] else ...[
-            Spacer(flex: 2,)
+            Spacer(
+              flex: 2,
+            )
           ],
           if (onProceed != null) ...[
             Flexible(
